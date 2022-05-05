@@ -4,12 +4,12 @@
 
 IteratorLI::IteratorLI(const LI& li) : lista(li) {
     /* de adaugat */
-    this->index = lista.prim;
+    this->index = lista.head;
 }
 
 void IteratorLI::prim() {
     /* de adaugat */
-    this->index = this->lista.prim;
+    this->index = this->lista.head;
 }
 
 void IteratorLI::urmator() {
@@ -24,7 +24,8 @@ void IteratorLI::urmator() {
 
 bool IteratorLI::valid() const {
     /* de adaugat */
-    return this->index >= 0;
+    if (this->index < 0) return false;
+    else return true;
 }
 
 TElem IteratorLI::element() const {

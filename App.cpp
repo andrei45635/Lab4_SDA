@@ -3,7 +3,7 @@
 #include "TestExtins.h"
 
 int main() {
-    testAll();
+    //testAll();
     std::cout << "Finished short test..." << '\n';
     testAllExtins();
     std::cout << "Finished extended test..." << '\n';

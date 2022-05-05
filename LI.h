@@ -14,7 +14,6 @@ public:
 	int size;
 	TElem* elems;
 	int* urm;
-	int prim;
 	int primLiber;
 	int head;
 
