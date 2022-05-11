@@ -3,34 +3,33 @@
 #include <exception>
 
 IteratorLI::IteratorLI(const LI& li) : lista(li) {
-    /* de adaugat */
-    this->index = lista.head;
+	/* de adaugat */
+	this->index = li.head;
 }
 
 void IteratorLI::prim() {
-    /* de adaugat */
-    this->index = this->lista.head;
+	/* de adaugat */
+	this->index = this->lista.head;
 }
 
 void IteratorLI::urmator() {
-    /* de adaugat */
-    if (!valid()) {
-        throw std::exception("iterator invalid!\n");
-    }
-    else {
-        this->index++;
-    }
+	/* de adaugat */
+	if (this->index == -1) {
+		throw std::exception("iterator invalid!\n");
+	}
+	//this->index++;
+	this->index = this->lista.urm[this->index];
 }
 
 bool IteratorLI::valid() const {
-    /* de adaugat */
-    if (this->index < 0) return false;
-    else return true;
+	/* de adaugat */
+	return this->index != -1;
 }
 
 TElem IteratorLI::element() const {
-    /* de adaugat */
-    if (!valid()) {
-        throw std::exception("iterator invalid!\n");
-    } else return this->lista.elems[this->index];
+	/* de adaugat */
+	if (this->index > this->lista.size || this->index < 0) {
+		throw std::exception("iterator invalid!\n");
+	}
+	return this->lista.elems[this->index];
 }

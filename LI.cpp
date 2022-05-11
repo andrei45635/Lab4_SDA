@@ -7,37 +7,70 @@ LI::LI() {
 	/* de adaugat */
 	this->cap = INIT_CAP;
 	this->size = 0;
+
 	this->elems = new TElem[cap];
 	this->urm = new int[cap];
-	this->primLiber = -1;
+
 	this->head = -1;
+	for (int i = 0; i < cap - 1; i++) {
+		this->urm[i] = i + 1;
+	}
+	this->urm[cap - 1] = -1;
+	this->primLiber = 0;
+}
+
+int LI::aloca() {
+	auto i = this->primLiber;
+	this->primLiber = this->urm[this->primLiber];
+	return i;
+}
+
+void LI::dealoca(int i) {
+	this->urm[i] = this->primLiber;
+	this->primLiber = i;
+}
+
+int LI::createNode(TElem e) {
+	if (this->primLiber == this->cap - 1) {
+		check_if_resize();
+	}
+	int i = aloca();
+	if (i != -1) {
+		this->elems[i] = e;
+		this->urm[i] = -1;
+	}
+	return i;
 }
 
 int LI::dim() const {
-	/* de adaugat */
+	/* de adaugat*/
 	return this->size;
 }
 
-
 bool LI::vida() const {
 	/* de adaugat */
-	if (this->size <= 0) return true;
-	else return false;
+	return this->head == -1;
 }
 
 void LI::check_if_resize() {
-	if (this->size >= this->cap) {
-		int newcap = 2 * this->cap + 1;
-		TElem* new_elems = new TElem[newcap];
-		TElem* new_urm = new int[newcap];
-		std::copy(this->elems + 0, this->elems + cap, new_elems + 0);
-		std::copy(this->urm + 0, this->urm + cap, new_urm + 0);
-		delete[] this->elems;
-		this->elems = new_elems;
-		delete[] this->urm;
-		this->urm = new_urm;
-		this->cap = newcap;
+
+	int newcap = 2 * this->cap + 1;
+	TElem* new_elems = new TElem[newcap];
+	int* new_urm = new int[newcap];
+	this->primLiber = this->cap;
+	this->cap = newcap;
+	for (int i = 0; i < cap - 1; i++) {
+		new_urm[i] = i + 1;
 	}
+	new_urm[this->cap - 1] = -1;
+	for (int i = 0; i < this->dim(); i++) {
+		new_elems[i] = this->elems[i];
+		new_urm[i] = this->urm[i];
+	}
+	delete[] this->elems;
+	this->elems = new_elems;
+	delete[] this->urm;
+	this->urm = new_urm;
 }
 
 // returnare element
@@ -67,19 +100,9 @@ TElem LI::modifica(int i, TElem e) {
 	if (i < 0 || i > this->size) {
 		throw std::exception("invalid\n");
 	}
-	else if (!vida()) {
-		IteratorLI it = this->iterator();
-		it.prim();
-		for (int i = 0; i < this->size; i++) {
-			TElem current = it.element();
-			if (current == i) {
-				TElem old_val = elems[i];
-				elems[i] = e;
-				return old_val;
-			}
-			it.urmator();
-		}
-	}
+	TElem vechi = this->elems[i];
+	this->elems[i] = e;
+	return vechi;
 }
 
 // adaugare element la sfarsit
@@ -90,12 +113,13 @@ void LI::adaugaSfarsit(TElem e) {
 	* CG: 0(1)
 	* CM: 0(1)
 	*/
-	check_if_resize();
-	this->elems[this->size] = e;
-	this->urm[this->elems[this->size]] = this->elems[e];
-	this->primLiber = this->urm[this->elems[this->size]];
-	//this->primLiber = -1;
-	this->head = this->elems[this->size];
+	//check_if_resize();
+	if (this->head == -1) this->head = 0;
+	if (this->size >= this->cap) check_if_resize();
+	auto i = this->primLiber;
+	this->primLiber = this->urm[this->primLiber];
+	this->elems[i] = e;
+	this->urm[i] = -1;
 	this->size++;
 }
 
@@ -108,41 +132,16 @@ void LI::adauga(int i, TElem e) {
 	* CG: O(this->size)
 	* CM: O(this->size)
 	*/
-	if (i < 0 || i > this->size) {
+	if (i < 0 || i >= this->dim()) {
 		throw std::exception("invalid\n");
 	}
-	//daca elementul e pe prima pozitie si are elemente dupa el
-	if (!vida() && i == 0) {
-		check_if_resize();
-		TElem aux = this->elems[i];
-		this->elems[i] = e;
-		this->head = this->elems[i];
-		this->urm[i] = aux;
-		this->elems[i + 1] = this->urm[i];
-		this->primLiber = this->urm[e];
-		this->size++;
-	}
-	//daca elementul e pe prima pozitie
-	else if (vida() && i == 0) {
-		check_if_resize();
-		this->elems[i] = e;
-		this->head = this->elems[i];
-		this->urm[i] = -1;
-		this->primLiber = this->urm[i];
-		this->size++;
-	}
-	//daca elementul e pe o pozitie aleatoare (nu ultima)
-	else if (!vida() && (i > 0 && i < this->size)) {
-		check_if_resize();
-		for (int i = 0; i <= this->size; i++) {
-			this->elems[i] = this->elems[i + 1]; //facem loc
-		}
-		TElem aux = this->elems[i];
-		this->elems[i] = e;
-		this->urm[this->elems[i]] = aux;
-		this->size++;
-		if (i == this->size) adaugaSfarsit(e);
-	}
+	int free_pos = createNode(e);
+	this->urm[free_pos] = this->urm[i];
+	this->elems[free_pos] = i;
+	this->elems[i] = e;
+
+	this->urm[free_pos] = -1;
+	this->urm[i] = free_pos;
 }
 
 // sterge element de pe o pozitie i si returneaza elementul sters
@@ -154,13 +153,22 @@ TElem LI::sterge(int i) {
 	* CG: O(this->size)
 	* CM: O(this->size)
 	*/
-	if (i < 0 || i >= this->size) {
+	if (i < 0 || i > this->size) {
 		throw std::exception("invalid\n");
 	}
 	TElem cautat = this->elems[i];
-	for (int cnt = 0; cnt < this->size; cnt++) {
-		if (cnt == i) {
-			this->elems[cnt] = this->elems[cnt + 1];
+	for (int k = 0; k <= this->size; k++) {
+		if (i == this->head) {
+			this->head = this->urm[k];
+			this->size--;
+		} 
+		if (i == this->size && k > 0) {
+			this->urm[this->elems[k - 1]] = -1;
+			this->primLiber = 0;
+			this->size--;
+		}
+		else if (i > 0 && i < this->size && k > 0 && k < this->size) {
+			this->urm[this->elems[k - 1]] = this->urm[this->elems[i]];
 			this->size--;
 		}
 	}
@@ -176,17 +184,48 @@ int LI::cauta(TElem e) const {
 	* CM: O(this->size)
 	*/
 	if (!vida()) {
-		IteratorLI it = this->iterator();
-		it.prim();
-		while (it.valid()) {
-			TElem current = it.element();
-			if (current == e) {
-				return it.index;
-			}
-			it.urmator();
+		for (int i = 0; i <= this->size; i++) {
+			if (this->elems[i] == e)
+				return i;
 		}
 	}
 	return -1;
+}
+
+//complexitate O(sfarsit-inceput+1)
+//caz favorabil -> una din pozitii nu e valida => 0(1)
+//caz defavorabil -> pozitiile sunt valide => 0(sfarsit-inceput+1)
+//caz mediu -> nu se arunca exceptie => 0(sfarsit-inceput+1)
+
+//invesreazaIntre(inceput, sfarsit, LI lista)
+//pre: inceput->numar intreg, pozitia de inceput
+//	   sfarsit->numar intreg, pozitia de sfarsit
+//post: lista'
+//
+//	daca inceput < 0 sau sfarsit < 0 sau inceput > dimensiune sau sfarsit > dimensiune
+//		@arunca exceptie
+//	cat timp inceput <= sfarsit executa
+//		aux <- elems[inceput]
+//		elems[inceput] <- elems[sfarsit]
+//		elems[sfarist] <- aux
+//		inceput <- inceput + 1
+//		sfarsit <- sfarsit -1
+//Sf algoritm
+
+void LI::inverseazaIntre(int inceput, int sfarsit)
+{
+	if (inceput < 0 || sfarsit < 0 || inceput > this->size || sfarsit > this->size)
+		throw std::exception();
+
+	while (inceput <= sfarsit)
+	{
+		TElem aux;
+		aux = this->elems[inceput];
+		this->elems[inceput] = this->elems[sfarsit];
+		this->elems[sfarsit] = aux;
+		inceput++;
+		sfarsit--;
+	}
 }
 
 IteratorLI LI::iterator() const {

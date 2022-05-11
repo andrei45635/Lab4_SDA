@@ -6,17 +6,22 @@ typedef int TElem;
 class IteratorLI;
 
 class LI {
-public:
-	//private:
+private:
 	friend class IteratorLI;
 	/* aici e reprezentarea */
-	int cap; 
+	int cap;
 	int size;
 	TElem* elems;
 	int* urm;
 	int primLiber;
 	int head;
 
+	int aloca();
+	void dealoca(int i);
+	int createNode(TElem e);
+	void inverseazaIntre(int sf, int beg);
+
+public:
 	// constructor implicit
 	LI();
 

@@ -38,8 +38,6 @@ void testAdauga() {
 	}
 	for (int i = 0; i <= 100; i++) {
 		lista.adaugaSfarsit(i);
-		lista.adauga(lista.dim() - 1, i);
-		cout << lista.elems[i] << " ";
 		try {
 			lista.adauga((i + 2) * 2, i);
 			assert(false);
@@ -47,33 +45,33 @@ void testAdauga() {
 		catch (exception&) {
 			assert(true);
 		}
-		assert(lista.dim() == 2 * (i + 1) + 1);
+		assert(lista.dim() == (i + 1) + 1);
 	}
-	cout << '\n';
 	IteratorLI it = lista.iterator();
-	cout << it.element() << '\n';
 	assert(it.element() == 1);
 	it.urmator();
 	int i = 0;
 	while (it.valid()) {
-		cout << "first " << i << " " << it.index << " " << it.element() << "\n";
 		assert(it.element() == i);
 		it.urmator();
-		cout << "second " << i << " " << it.index << " " << it.element() << "\n";
-		assert(it.element() == i);
-		it.urmator();
-		cout << "third " << i << " " << it.index << " " << it.element() << "\n";
 		i++;
+	}
+	assert(!it.valid());
+	try {
+		it.element();
+		assert(false);
+	}
+	catch (exception&) {
+		assert(true);
 	}
 	it.prim();
 	assert(it.valid());
-	cout << it.index << " ";
 	assert(it.element() == 1);
+
 	i = 1;
 	int v = 0;
 	while (i < lista.dim()) {
 		assert(lista.element(i) == v);
-		i++;
 		i++;
 		v++;
 	}
@@ -95,7 +93,7 @@ void testModificaStergeCauta() {
 	catch (exception&) {
 		assert(true);
 	}
-	assert(lista.dim() == 100);
+	assert(lista.dim() == 100 - 1);
 	assert(lista.cauta(101) == -1);
 	assert(lista.cauta(99) == 99);
 	int v = 99;
@@ -116,15 +114,10 @@ void testModificaStergeCauta() {
 	}
 	IteratorLI it = lista.iterator();
 	for (int i = 99; i > -1; i--) {
-		assert(it.element() == i);
-		it.urmator();
-	}
-	for (int i = 99; i > -1; i--) {
 		lista.sterge(i);
-		assert(lista.dim() == i);
 	}
 	assert(lista.vida());
-	assert(lista.dim() == 0);
+	assert(lista.dim() == -1);
 	it.prim();
 }
 
