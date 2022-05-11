@@ -1,4 +1,4 @@
-/*//daca elementul e pe prima pozitie si are elemente dupa el
+/*//daca elementul e pe prima pozitie si are elemente dupa el*/
 	if (!vida() && i == 0) {
 		check_if_resize();
 		TElem aux = this->elems[i];
@@ -29,16 +29,16 @@
 		this->urm[this->elems[i]] = aux;
 		this->size++;
 		if (i == this->size) adaugaSfarsit(e);
-	}*/
+	}
 
 
-/*check_if_resize();
+/**/check_if_resize();
 	this->elems[this->size] = e;
 	this->urm[this->elems[this->size]] = this->elems[e];
 	this->primLiber = this->urm[this->elems[this->size]];
 	//this->primLiber = -1;
 	this->head = this->elems[this->size];
-	this->size++;*/
+	this->size++;
 
 
 //DELETE
@@ -74,7 +74,7 @@ if (!vida()) {
 	}
 
 
-/*if (i == this->head) {
+/**/if (i == this->head) {
 		this->head = this->urm[i];
 	}
 	else {
@@ -84,7 +84,7 @@ if (!vida()) {
 		}
 		this->urm[current] = this->urm[i];
 	}
-	dealoca(i);*/
+	dealoca(i);
 
 
 
@@ -102,7 +102,7 @@ else if (!vida()) {
 		}
 	}
 
-	/*for (int i = 99; i > -1; i--) {
+	/**/for (int i = 99; i > -1; i--) {
 		assert(it.element() == i);
 		it.urmator();
-	}*/
+	}
